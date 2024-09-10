@@ -2,26 +2,18 @@ package com.mccarty.currentdeviceinfo.ui.theme
 
 import android.net.ConnectivityManager
 import android.net.LinkProperties
-import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.mccarty.currentdeviceinfo.MainActivity
 import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTime
 import com.mccarty.currentdeviceinfo.domain.usecase.NetworkState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,11 +46,11 @@ class MainViewModel @Inject constructor(
     private val _currentUtcTime = MutableStateFlow<String?>(null)
     val currentUtcTime = _currentUtcTime
 
-    private val _currentPosition = MutableStateFlow<MainActivity.Position?>(null)
+    private val _currentPosition = MutableStateFlow(MainActivity.Position())
     val currentPosition = _currentPosition
 
     private val parentScope = SupervisorJob()
-    val scope = CoroutineScope(defaultDispatcher + parentScope)
+    private val scope = CoroutineScope(defaultDispatcher + parentScope)
 
     private var localTimeJob: Job? = null
     private var utcTimeJob: Job? = null
@@ -137,5 +129,4 @@ class MainViewModel @Inject constructor(
     fun setPosition(position: MainActivity.Position) {
         _currentPosition.value = position
     }
-
 }

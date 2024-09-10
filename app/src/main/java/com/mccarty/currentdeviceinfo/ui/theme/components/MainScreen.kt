@@ -24,7 +24,7 @@ fun MainScreen(
     currentUtcTime: String?,
     wifiIpAddress: String?,
     cellIpAddress: String?,
-    currentPosition: MainActivity.Position?,
+    currentPosition: MainActivity.Position,
     onClick: () -> Unit,
 ) {
     Column(
@@ -50,8 +50,8 @@ fun MainScreen(
             textString,
             stringResource(id = R.string.lat_label),
             stringResource(id = R.string.lon_label),
-            currentPosition?.lat.toString(),
-            currentPosition?.lat.toString(),
+            currentPosition.lat.toString(),
+            currentPosition.lat.toString(),
         )
 
         DeviceInfo(

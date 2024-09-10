@@ -76,6 +76,9 @@ dependencies {
 
     // Compose
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Timber
+    implementation(libs.timber)
 }
 
 kapt {
