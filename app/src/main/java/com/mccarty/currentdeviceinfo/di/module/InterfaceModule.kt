@@ -1,0 +1,16 @@
+package com.mccarty.currentdeviceinfo.di.module
+
+import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTime
+import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTimeUseCase
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class InterfaceModule {
+
+    @Binds
+    abstract fun provideGetDateTime(getDataTimeUseCase: GetDataTimeUseCase): GetDataTime
+}

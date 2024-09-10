@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CurrentDeviceInfo</string>
+
+    <string name="button_export">Export</string>
+    <string name="current_time">Current Time:</string>
+
+    <string name="local_time_label">Current Time:</string>
+    <string name="utc_time_label">UTC Time:</string>
+    <string name="wifi_ip_address_label">Wifi IP Address:</string>
+    <string name="lat_label">Latitude:</string>
+    <string name="lon_label">Longitude:</string>
+    <string name="cellular_ip_address_label">Cellular IP Address:</string>
+</resources>
