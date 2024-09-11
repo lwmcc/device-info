@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import android.net.wifi.WifiInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.mccarty.currentdeviceinfo.ipAddressPattern
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,14 +19,8 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 
+// TODO: remove?
 class NetworkState @Inject constructor(private val connectivityManager: ConnectivityManager) {
-    val ipAddressPattern = Pattern.compile(
-        "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
-                + "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]"
-                + "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}"
-                + "|[1-9][0-9]|[0-9]))"
-    )
-
     // TODO: flatten those loops
     fun getCellularIpAddress() {
         val interfaces: List<NetworkInterface> =

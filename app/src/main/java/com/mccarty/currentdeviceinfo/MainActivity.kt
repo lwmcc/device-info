@@ -2,16 +2,19 @@ package com.mccarty.currentdeviceinfo
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -20,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider.getUriForFile
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -34,7 +38,7 @@ import com.mccarty.currentdeviceinfo.ui.theme.components.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,18 +50,18 @@ class MainActivity : ComponentActivity() {
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, LOCATION_REQUEST_INTERVAL)
         .setWaitForAccurateLocation(false)
         .setMinUpdateIntervalMillis(MIN_UPDATE_INTERVAL)
-        .setMaxUpdateDelayMillis(MAX_UPDATE_DELAY)
         .build()
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-            for (location in result.locations) {
+            for (location in result.locations) { // TODO: reduce number of updates?
                 mainViewModel.setPosition(
+                    this@MainActivity.getString(R.string.csv_file_header),
                     Position(
                         lat = location.latitude,
                         lon = location.longitude,
                         time = location.time
-                    )
+                    ),
                 )
             }
         }
@@ -74,7 +78,7 @@ class MainActivity : ComponentActivity() {
                             Looper.getMainLooper(),
                         )
                     } catch (se: SecurityException) {
-                        Timber.e(se.message)
+                        Timber.e(se.message ?: "An error occurred while trying to request location updates")
                     }
                 }
 
@@ -142,7 +146,16 @@ class MainActivity : ComponentActivity() {
                         cellIpAddress = cellIpAddress,
                         currentPosition = currentPosition,
                         onClick = {
+                            val filePath = File(this@MainActivity.filesDir.absolutePath, "/")
+                            val newFile = File(filePath, DEVICE_OUTPUT)
+                            val contentUri: Uri =
+                                getUriForFile(this@MainActivity, FILE_AUTHORITY, newFile)
 
+                            startForResult.launch(Intent(Intent.ACTION_VIEW).apply {
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                                setDataAndType(contentUri, "*/*")
+                            })
                         },
                     )
                 }
@@ -153,17 +166,23 @@ class MainActivity : ComponentActivity() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 mainViewModel.setPosition(
+                    this@MainActivity.getString(R.string.csv_file_header),
                     Position(
                         lat = it.latitude,
                         lon = it.longitude,
                         time = it.time
-                    )
+                    ),
                 )
             }
         }
 
         checkPermission()
     }
+
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            Timber.d("Return from file export ${result.resultCode}")
+        }
 
     private fun checkPermission() {
         when {
@@ -215,8 +234,9 @@ class MainActivity : ComponentActivity() {
     data class Position(val lat: Double? = 0.0, val lon: Double? = 0.0, val time: Long? = 0)
 
     companion object {
-        const val LOCATION_REQUEST_INTERVAL = 60L
-        const val MIN_UPDATE_INTERVAL = 30L
-        const val MAX_UPDATE_DELAY = 2L
+        const val FILE_AUTHORITY = "com.mccarty.fileprovider"
+        const val DEVICE_OUTPUT = "current_device_data.txt"
+        const val LOCATION_REQUEST_INTERVAL = 10_000L
+        const val MIN_UPDATE_INTERVAL = 5_000L
     }
 }

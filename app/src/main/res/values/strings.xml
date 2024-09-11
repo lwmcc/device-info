@@ -10,4 +10,6 @@
     <string name="lat_label">Latitude:</string>
     <string name="lon_label">Longitude:</string>
     <string name="cellular_ip_address_label">Cellular IP Address:</string>
+
+    <string name="csv_file_header">Current Local Time,Current UTC Time,Latitude,Longitude,Wifi IP Address,Cellular IP Address\n</string>
 </resources>

@@ -34,7 +34,7 @@ fun MainScreen(
             .padding(24.dp)
     ) {
         val containerPadding = 24.dp
-        val textString = MaterialTheme.typography.labelLarge
+        val textString = MaterialTheme.typography.titleMedium
 
         DeviceInfo(
             containerPadding,
@@ -51,7 +51,7 @@ fun MainScreen(
             stringResource(id = R.string.lat_label),
             stringResource(id = R.string.lon_label),
             currentPosition.lat.toString(),
-            currentPosition.lat.toString(),
+            currentPosition.lon.toString(),
         )
 
         DeviceInfo(
@@ -65,9 +65,7 @@ fun MainScreen(
 
         SubmitButton(
             name = stringResource(id = R.string.button_export),
-            onClick = {
-                onClick
-            })
+            onClick = { onClick() })
     }
 }
 
