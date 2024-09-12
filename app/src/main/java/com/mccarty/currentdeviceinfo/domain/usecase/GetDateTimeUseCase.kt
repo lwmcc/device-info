@@ -15,15 +15,15 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Named
 
-class GetDataTimeUseCase @Inject constructor(
+class GetDateTimeUseCase @Inject constructor(
     @Named("default")
-    private val defaultDispatcher: CoroutineDispatcher
-) : GetDataTime {
+    private val defaultDispatcher: CoroutineDispatcher,
+) : GetDateTime {
         @RequiresApi(Build.VERSION_CODES.O)
         override suspend fun getCurrentLocalTime(): Flow<String> = flow {
                 while (true) {
                     delay(TIME_DELAY)
-                    emit(LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT_12)))
+                    emit(LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)))
                 }
         }.buffer().flowOn(defaultDispatcher)
 
@@ -31,13 +31,12 @@ class GetDataTimeUseCase @Inject constructor(
     override suspend fun getCurrentUtcTime(): Flow<String> = flow {
             while (true) {
                 delay(TIME_DELAY)
-                emit(OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT_24)))
+                emit(OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern(TIME_DISPLAY_FORMAT)))
             }
     }
 
     companion object {
         const val TIME_DELAY = 1_000L
-        const val TIME_DISPLAY_FORMAT_12 = "HH:mm:ss a"
-        const val TIME_DISPLAY_FORMAT_24 = "HH:mm:ss"
+        const val TIME_DISPLAY_FORMAT = "HH:mm:ss"
     }
 }

@@ -3,7 +3,7 @@ package com.mccarty.currentdeviceinfo.ui.theme
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mccarty.currentdeviceinfo.MainActivity
-import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTime
+import com.mccarty.currentdeviceinfo.domain.usecase.GetDateTime
 import com.mccarty.currentdeviceinfo.domain.usecase.GetIpAddress
 import com.mccarty.currentdeviceinfo.domain.usecase.HandleCsvFile
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ import javax.inject.Named
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getDataTime: GetDataTime,
+    private val getDataTime: GetDateTime,
     private val handleCsvFile: HandleCsvFile,
     private val getIpAddress: GetIpAddress,
     @Named("default")
@@ -132,7 +132,11 @@ class MainViewModel @Inject constructor(
         builder.append("${_cellIpAddress.value}\n")
 
         viewModelScope.launch {
-            handleCsvFile.appendCsvFile(header, builder.toString())
+            try {
+                handleCsvFile.appendCsvFile(header, builder.toString())
+            } catch (e: Exception) {
+                println("MainViewModel ***** ${e.message}")
+            }
         }
     }
 }

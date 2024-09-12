@@ -1,6 +1,6 @@
 package com.mccarty.currentdeviceinfo.ui.theme
 
-import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTime
+import com.mccarty.currentdeviceinfo.domain.usecase.GetDateTime
 import com.mccarty.currentdeviceinfo.domain.usecase.GetIpAddress
 import com.mccarty.currentdeviceinfo.domain.usecase.HandleCsvFile
 import junit.framework.TestCase.assertEquals
@@ -22,8 +22,6 @@ class MainViewModelTest {
     val coroutineRule = CoroutineRule()
 
     private lateinit var mainViewModel: MainViewModel
-
-    val fakeTime = "09:11:03"
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -62,13 +60,13 @@ class MainViewModelTest {
     @Test
     fun `assert local times are equal`() = runTest {
         mainViewModel.startCurrentLocalTimeJob()
-        assertEquals(fakeTime,  mainViewModel.currentLocalTime.value)
+        assertEquals(FAKE_TIME,  mainViewModel.currentLocalTime.value)
     }
 
     @Test
     fun `assert utc times are equal`() = runTest {
         mainViewModel.startCurrentUtcTimeJob()
-        assertEquals(fakeTime,  mainViewModel.currentUtcTime.value)
+        assertEquals(FAKE_TIME,  mainViewModel.currentUtcTime.value)
     }
 
     @Test
@@ -85,13 +83,13 @@ class MainViewModelTest {
         assertNull( mainViewModel.utcTimeJob)
     }
 
-    inner class GetDataTimeFake: GetDataTime {
+    inner class GetDataTimeFake: GetDateTime {
         override suspend fun getCurrentLocalTime(): Flow<String> = flow {
-            emit(fakeTime)
+            emit(FAKE_TIME)
         }
 
         override suspend fun getCurrentUtcTime(): Flow<String> = flow {
-            emit(fakeTime)
+            emit(FAKE_TIME)
         }
     }
 
@@ -106,5 +104,9 @@ class MainViewModelTest {
             // TODO: implement
             return ""
         }
+    }
+
+    companion object {
+        const val FAKE_TIME = "09:11:03"
     }
 }
