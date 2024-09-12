@@ -54,7 +54,7 @@ class MainViewModelTest {
     @Test
     fun `assert hasInternet true`() {
         mainViewModel.hasInternetConnection(true)
-        assertTrue(mainViewModel.hasInternet)
+        assertTrue(mainViewModel.hasInternet.value)
     }
 
     @Test
@@ -100,7 +100,7 @@ class MainViewModelTest {
     }
 
     class GetIpAddressFake: GetIpAddress {
-        override fun getIpAddress(): String {
+        override suspend fun getIpAddress(): String {
             // TODO: implement
             return ""
         }

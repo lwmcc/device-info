@@ -1,5 +1,5 @@
 package com.mccarty.currentdeviceinfo.domain.usecase
 
 interface GetIpAddress {
-    fun getIpAddress(): String
+    suspend fun getIpAddress(): String
 }

@@ -44,6 +44,9 @@ class MainViewModel @Inject constructor(
     private val _currentPosition = MutableStateFlow(MainActivity.Position())
     val currentPosition = _currentPosition
 
+    private val _hasInternet = MutableStateFlow(false)
+    val hasInternet = _hasInternet
+
     private val parentScope = SupervisorJob()
     private val scope = CoroutineScope(defaultDispatcher + parentScope)
 
@@ -53,9 +56,6 @@ class MainViewModel @Inject constructor(
     var hasWifiConnection = false
         private set
 
-    var hasInternet = false
-        private set
-
     var localTimeJob: Job? = null
         private set
 
@@ -63,17 +63,19 @@ class MainViewModel @Inject constructor(
        private set
 
     fun setIpAddress() {
-        if (hasWifiConnection) {
-            _wifiIpAddress.value = getIpAddress.getIpAddress()
-            _cellIpAddress.value = null
-        } else if (hasCellularConnection) {
-            _wifiIpAddress.value = null
-            _cellIpAddress.value = getIpAddress.getIpAddress()
+        viewModelScope.launch {
+            if (hasWifiConnection) {
+                _wifiIpAddress.value = getIpAddress.getIpAddress()
+                _cellIpAddress.value = null
+            } else if (hasCellularConnection) {
+                _wifiIpAddress.value = null
+                _cellIpAddress.value = getIpAddress.getIpAddress()
+            }
         }
     }
 
     fun hasInternetConnection(hasInternet: Boolean) {
-        this.hasInternet = hasInternet
+        _hasInternet.value = hasInternet
     }
 
     fun isWifiNetwork(isWifi: Boolean) {
@@ -132,11 +134,7 @@ class MainViewModel @Inject constructor(
         builder.append("${_cellIpAddress.value}\n")
 
         viewModelScope.launch {
-            try {
-                handleCsvFile.appendCsvFile(header, builder.toString())
-            } catch (e: Exception) {
-                println("MainViewModel ***** ${e.message}")
-            }
+            handleCsvFile.appendCsvFile(header, builder.toString())
         }
     }
 }

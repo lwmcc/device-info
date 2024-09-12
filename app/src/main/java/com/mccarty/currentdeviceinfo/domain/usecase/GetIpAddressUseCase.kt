@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetIpAddressUseCase @Inject constructor(private val connectivityManager: ConnectivityManager) :
     GetIpAddress {
-    override fun getIpAddress(): String {
+    override suspend fun getIpAddress(): String {
         val linkProperties =
             connectivityManager.getLinkProperties(connectivityManager.activeNetwork) as LinkProperties
         return linkProperties.linkAddresses.firstOrNull {

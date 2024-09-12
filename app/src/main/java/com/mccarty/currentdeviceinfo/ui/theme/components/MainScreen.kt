@@ -6,11 +6,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -27,45 +32,49 @@ fun MainScreen(
     currentPosition: MainActivity.Position,
     onClick: () -> Unit,
 ) {
-    Column(
+    val containerPadding = 24.dp
+    val textString = MaterialTheme.typography.titleMedium
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.onSurface)
             .padding(24.dp)
     ) {
-        val containerPadding = 24.dp
-        val textString = MaterialTheme.typography.titleMedium
 
-        DeviceInfo(
-            containerPadding,
-            textString,
-            firstLabel = stringResource(id = R.string.local_time_label),
-            secondLabel = stringResource(id = R.string.utc_time_label),
-            firstInfoLine = currentLocalTime,
-            secondInfoLline = currentUtcTime,
-        )
 
-        DeviceInfo(
-            containerPadding,
-            textString,
-            stringResource(id = R.string.lat_label),
-            stringResource(id = R.string.lon_label),
-            currentPosition.lat.toString(),
-            currentPosition.lon.toString(),
-        )
+        item {
+            DeviceInfo(
+                containerPadding,
+                textString,
+                firstLabel = stringResource(id = R.string.local_time_label),
+                secondLabel = stringResource(id = R.string.utc_time_label),
+                firstInfoLine = currentLocalTime,
+                secondInfoLline = currentUtcTime,
+            )
 
-        DeviceInfo(
-            containerPadding,
-            textString,
-            firstLabel = stringResource(id = R.string.wifi_ip_address_label),
-            secondLabel = stringResource(id = R.string.cellular_ip_address_label),
-            firstInfoLine = wifiIpAddress,
-            secondInfoLline = cellIpAddress,
-        )
+            DeviceInfo(
+                containerPadding,
+                textString,
+                stringResource(id = R.string.lat_label),
+                stringResource(id = R.string.lon_label),
+                currentPosition.lat.toString(),
+                currentPosition.lon.toString(),
+            )
 
-        SubmitButton(
-            name = stringResource(id = R.string.button_export),
-            onClick = { onClick() })
+            DeviceInfo(
+                containerPadding,
+                textString,
+                firstLabel = stringResource(id = R.string.wifi_ip_address_label),
+                secondLabel = stringResource(id = R.string.cellular_ip_address_label),
+                firstInfoLine = wifiIpAddress,
+                secondInfoLline = cellIpAddress,
+            )
+
+            SubmitButton(
+                name = stringResource(id = R.string.button_export),
+                onClick = { onClick() })
+        }
     }
 }
 
@@ -84,40 +93,43 @@ fun DeviceInfo(
             .padding(padding)
     ) {
         Row {
-            Text(
-                text = firstLabel,
-                modifier = Modifier
-                    .paddingFromBaseline(top = 25.dp)
-                    .padding(start = 16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                style = textStyle,
-            )
-            Text(
-                text = firstInfoLine ?: "not connected",
-                modifier = Modifier
-                    .paddingFromBaseline(top = 25.dp)
-                    .padding(start = 16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                style = textStyle,
-            )
-        }
-        Row {
-            Text(
-                text = secondLabel,
-                modifier = Modifier
-                    .paddingFromBaseline(top = 25.dp)
-                    .padding(start = 16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                style = textStyle,
-            )
-            Text(
-                text = secondInfoLline ?: "not connected",
-                modifier = Modifier
-                    .paddingFromBaseline(top = 25.dp)
-                    .padding(start = 16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                style = textStyle,
-            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = firstLabel,
+                    modifier = Modifier
+                        .paddingFromBaseline(top = 25.dp)
+                        .padding(start = 16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    style = textStyle,
+                )
+                Text(
+                    text = secondLabel,
+                    modifier = Modifier
+                        .paddingFromBaseline(top = 25.dp)
+                        .padding(start = 16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    style = textStyle,
+                )
+            }
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = firstInfoLine ?: "not connected",
+                    modifier = Modifier
+                        .paddingFromBaseline(top = 25.dp)
+                        .padding(start = 16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    style = textStyle,
+                )
+                Text(
+                    text = secondInfoLline ?: "not connected",
+                    modifier = Modifier
+                        .paddingFromBaseline(top = 25.dp)
+                        .padding(start = 16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    style = textStyle,
+                )
+            }
         }
     }
 }
@@ -128,10 +140,15 @@ fun SubmitButton(name: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-        Button(
+        OutlinedButton(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .width(dimensionResource(id = R.dimen.primary_button)),
             onClick = onClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Black
+            ),
         ) {
             Text(text = name)
         }
