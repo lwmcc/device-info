@@ -1,13 +1,11 @@
 package com.mccarty.currentdeviceinfo.ui.theme
 
-import android.net.ConnectivityManager
-import android.net.LinkProperties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mccarty.currentdeviceinfo.MainActivity
 import com.mccarty.currentdeviceinfo.domain.usecase.GetDataTime
+import com.mccarty.currentdeviceinfo.domain.usecase.GetIpAddress
 import com.mccarty.currentdeviceinfo.domain.usecase.HandleCsvFile
-import com.mccarty.currentdeviceinfo.ipAddressPattern
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -24,16 +22,12 @@ import javax.inject.Named
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val connectivityManager: ConnectivityManager,
     private val getDataTime: GetDataTime,
     private val handleCsvFile: HandleCsvFile,
+    private val getIpAddress: GetIpAddress,
     @Named("default")
     defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-
-    private var hasCellularConnection: Boolean = false
-    private var hasWifiConnection: Boolean = false
-    private var hasInternet: Boolean = false
 
     private val _cellIpAddress = MutableStateFlow<String?>(null)
     val cellIpAddress = _cellIpAddress
@@ -53,29 +47,33 @@ class MainViewModel @Inject constructor(
     private val parentScope = SupervisorJob()
     private val scope = CoroutineScope(defaultDispatcher + parentScope)
 
-    private var localTimeJob: Job? = null
-    private var utcTimeJob: Job? = null
+    var hasCellularConnection = false
+        private set
+
+    var hasWifiConnection = false
+        private set
+
+    var hasInternet = false
+        private set
+
+    var localTimeJob: Job? = null
+        private set
+
+    var utcTimeJob: Job? = null
+       private set
 
     fun setIpAddress() {
-        val linkProperties = connectivityManager.getLinkProperties(connectivityManager.activeNetwork) as LinkProperties
-
-        val address = linkProperties.linkAddresses.firstOrNull() {
-            !it.address.isLoopbackAddress
-                    && !it.address.isLinkLocalAddress
-                    && ipAddressPattern.matcher(it.address.hostAddress as CharSequence).matches()
-        }.toString()
-
         if (hasWifiConnection) {
-            _wifiIpAddress.value = address
+            _wifiIpAddress.value = getIpAddress.getIpAddress()
             _cellIpAddress.value = null
         } else if (hasCellularConnection) {
             _wifiIpAddress.value = null
-            _cellIpAddress.value = address
+            _cellIpAddress.value = getIpAddress.getIpAddress()
         }
     }
 
-    fun hasInternetConnection(internet: Boolean) {
-        hasInternet = internet
+    fun hasInternetConnection(hasInternet: Boolean) {
+        this.hasInternet = hasInternet
     }
 
     fun isWifiNetwork(isWifi: Boolean) {
